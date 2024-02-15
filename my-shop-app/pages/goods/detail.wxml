@@ -1,0 +1,73 @@
+<view class="container">
+    <swiper class="goods-images" indicator-dots="{{true}}" circular="{{true}}">
+        <block wx:for="{{goods_detail.goods_images}}" wx:for-item="goods_image">
+            <swiper-item>
+                <image src="{{goods_image}}"/>
+            </swiper-item>
+        </block>
+    </swiper>
+    <view class="goods-intro">
+        <view class="goods-name">{{goods_detail.item_name}}</view>
+        <view class="goods-price-stock">
+            <view class="goods-price">￥{{goods_detail.item_price}}</view>
+            <view class="goods-stock">库存：{{goods_detail.item_stock}}</view>
+        </view>
+        <button class="goods-share" open-type="share">
+            <image src="/resources/share-pic.png"/>
+            <text>分享</text>
+        </button>
+
+
+    </view>
+
+    <view class="goods-desc">
+        <text>商品介绍</text>
+        <view class="goods-desc-images">
+            <image src="/resources/goods_6.jpg"/>
+            <image src="/resources/goods_6.jpg"/>
+            <image src="/resources/goods_6.jpg"/>
+        </view>
+    </view>
+
+    <view class="cart-and-buy">
+<!--        <view class="cart">-->
+<!--            <image class="cart-pic" src="/resources/cart-pic.png"></image>-->
+<!--            <view class="goods-num">(0)</view>-->
+<!--            <view style="position:absolute;bottom:4px;">购物车</view>-->
+<!--        </view>-->
+
+
+        <view class="sold-out" wx:if="{{goods_detail.item_stock <= 0}}">已售罄</view>
+        <block wx:else>
+<!--            <view class="add-cart" catch:tap="addCartTap">加入购物车</view>-->
+            <view class="buy" catch:tap="buyNowTap">立即购买</view>
+        </block>
+    </view>
+
+    <view class="popup-container" hidden="{{!show_popup}}">
+        <view class="popup-mask" catch:tap="popupCloseTap"></view>
+        <view class="popup-content">
+            <view class="popup-goods">
+                <image src="{{goods_detail.main_image}}"/>
+                <view class="popup-goods-info">
+                    <view class="popup-goods-name">{{goods_detail.item_name}}</view>
+                    <view class="popup-goods-price">￥{{goods_detail.item_price}}</view>
+                </view>
+            </view>
+            <view class="popup-close" catch:tap="popupCloseTap"/>
+            <view class="buy-number">
+                <text>购买数量</text>
+                <view class="number-box">
+                    <view class="number-minus {{can_not_minus?'gray':''}}" catch:tap="numberMinusTap">-</view>
+                    <view class="number">{{buy_number}}</view>
+                    <view class="number-plus {{can_not_plus?'gray':''}}" catch:tap="numberPlusTap">+</view>
+                </view>
+            </view>
+            <view class="buy-confirm" bind:tap="buyConfirm">
+                {{add_cart_popup ? '加入购物车' : '立即购买'}}
+            </view>
+        </view>
+    </view>
+
+
+</view>

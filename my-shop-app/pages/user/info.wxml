@@ -1,0 +1,28 @@
+<view class="container">
+    <view class="userinfo">
+        <button open-type="chooseAvatar" class="userinfo-avatar" bind:chooseavatar="onChooseAvatar">
+            <image wx:if="{{user_info && user_info.avatar}}" class="userinfo-avatar-image" src="{{ user_info.avatar }}"
+                   background-size="cover"></image>
+        </button>
+        <view class="nickname" wx:if="{{!edit_nickname}}">
+            <text class="userinfo-nickname">{{ user_info.nickname }}</text>
+            <view class="right-edit" bindtap="nicknameSet"></view>
+        </view>
+        <view class="nickname" wx:if="{{edit_nickname}}">
+            <input type="nickname" class="nickname-input" placeholder="请输入昵称" placeholder-style="color:#fff;"
+                   bindblur="nicknameInput"/>
+            <button class="finish-btn" bind:tap="finishEditNickname">完成</button>
+        </view>
+
+    </view>
+    <view style="height:20rpx;background: #eee;width:100%;"></view>
+    <view class="my-item" bind:tap="myOrder">我的订单</view>
+    <view class="my-item">
+        <navigator url="/pages/address/select?type=edit" hover-class="navigator-hover">我的收货地址</navigator>
+    </view>
+
+    <view style="height:20rpx;background: #eee;width:100%;"></view>
+    <view class="version">版本: 1.0.0</view>
+    <view style="height:20rpx;background: #eee;width:100%;"></view>
+
+</view>

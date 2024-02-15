@@ -1,0 +1,22 @@
+<view class="container">
+    <view class="address-list">
+        <view class="a-address" wx:for-items="{{addressList}}" wx:key="{{index}}">
+            <view class="left-text {{item.id === selected_address? 'active':''}}" bindtap="selectTap"
+                  data-id="{{item.id}}">
+                <view class="name-tel">
+                    {{item.nickname}} {{item.mobile}}
+                </view>
+                <view class="address-box">
+                    {{item.detail}}
+                </view>
+            </view>
+            <view class="right-edit" bind:tap="onEdit" data-id="{{item.id}}"></view>
+        </view>
+    </view>
+    <view class="address-select" wx:if="{{type==='select'}}">
+        <button class="create-btn-1" bind:tap="onCreate">新建</button>
+        <button class="confirm-btn" bind:tap="onConfirm">确认</button>
+    </view>
+
+    <button class="create-btn-2" wx:if="{{type==='edit'}}" bind:tap="onCreate">新建</button>
+</view>

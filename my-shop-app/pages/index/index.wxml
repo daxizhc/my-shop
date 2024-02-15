@@ -1,0 +1,48 @@
+<view class="container">
+    <swiper class="goods-banners" indicator-dots="{{true}}" circular="{{true}}" autoplay="true" interval="3000">
+        <block wx:for="{{banners}}" wx:key="item">
+            <swiper-item>
+                <image src="{{item.image}}"/>
+            </swiper-item>
+        </block>
+    </swiper>
+
+    <!--搜索框-->
+    <view class="search-view">
+        <view class="search-content">
+            <image src="/resources/search-pic.png" class="search-icon"/>
+            <input placeholder="请输入搜索内容" class="search-input" maxlength="30" confirm-type="搜索"
+                   bind:input='listenerSearchInput'>
+            </input>
+            <!--      按钮靠左侧点击无效     -->
+            <view class='search-btn' catch:tap="queryGoodsList">搜索</view>
+        </view>
+    </view>
+
+    <view>
+        <scroll-view scroll-x="true" class="cat-list" enable-flex>
+            <block wx:for="{{category_list}}" wx:for-item="category" wx:key="category">
+                <view class="cat-item cat-item-on" id="{{category.id}}"
+                      wx:if="{{category.id === category_id_selected}}">
+                    <text>{{category.category_name}}</text>
+                </view>
+                <view class="cat-item" id="{{category.id}}" wx:else bind:tap="onCategoryTap">
+                    <text>{{category.category_name}}</text>
+                </view>
+            </block>
+        </scroll-view>
+    </view>
+
+    <view class="goods-container">
+        <block wx:for="{{goods_list}}" wx:key="item">
+            <view class="goods-item" bind:tap="onGoodsItemTap" data-id="{{item.id}}">
+                <image src="{{item.main_image}}"></image>
+                <text class="goods-item-name">{{item.item_name}}</text>
+                <view style="display:flex;">
+                    <text class="goods-item-price">￥{{item.item_price}}</text>
+                </view>
+            </view>
+        </block>
+        <view class="goods-list-end" wx:if="{{!goods_list_has_next}}">我也是有底线的~</view>
+    </view>
+</view>

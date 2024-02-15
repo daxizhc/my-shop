@@ -1,0 +1,13 @@
+<view>
+    <view class="row-box">
+        请长按识别二维码支付
+    </view>
+
+    <image src="/resources/qr-pay.jpg" class="qr-pay" show-menu-by-longpress="{{true}}"></image>
+
+    <view class="bottom">
+        <view class="cancel-pay" bind:tap="cancelPay">取消</view>
+        <view class="finish-pay" bind:tap="finishPay">完成支付</view>
+    </view>
+
+</view>
