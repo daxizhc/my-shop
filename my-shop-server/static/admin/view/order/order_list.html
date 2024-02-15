@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <title>订单管理</title>
+    <link href="/admin/component/pear/css/pear.css" rel="stylesheet"/>
+    <style>
+        .layui-table-cell {
+            height: auto;
+            line-height: 28px;
+        }
+    </style>
+</head>
+<body class="pear-container">
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table id="order-table" lay-filter="order-table"></table>
+    </div>
+</div>
+
+<script type="text/html" id="goods-image">
+    <img src="{{ d.item_image }}" alt="" width="80px" height="80px">
+</script>
+
+<script type="text/html" id="goods-desc">
+    <div style="text-align: left; padding-left: 70px">
+        <div>名称: {{ d.item_name }}</div>
+        <div>单价: {{ d.item_price }}</div>
+        <div>数量: {{ d.item_count }}</div>
+    </div>
+</script>
+
+<script type="text/html" id="address-info">
+    <div style="text-align: left;">
+        <div>地址: {{ d.address_detail }}</div>
+        <div>收件人: {{ d.address_name }}</div>
+        <div>手机号: {{ d.address_mobile }}</div>
+    </div>
+</script>
+
+<script type="text/html" id="operate-bar">
+    {{ d.status == 1 ? '<button class="pear-btn pear-btn-primary pear-btn-sm" lay-event="deliver" >确认发货</button>
+    <button class="pear-btn pear-btn-danger pear-btn-sm" lay-event="backToPay">退回待支付</button>' : ''}}
+</script>
+
+
+<script src="/admin/component/layui/layui.js"></script>
+<script src="/admin/component/pear/pear.js"></script>
+<script>
+    const orderStatus = {0: '已创建', 1: '已支付', 2: '已发货', 3: '已完成'}
+
+    layui.use(['table', 'form', 'jquery', 'popup'], function () {
+        let table = layui.table;
+        let form = layui.form;
+        let $ = layui.jquery;
+
+        let cols = [
+            [
+                {title: '订单id', field: 'id', align: 'center', width: 100},
+                {title: '下单时间', field: 'create_time', align: 'center', width: 200},
+                {title: '商品图片', field: 'item_image', align: 'center', templet: '#goods-image', width: 120},
+                {title: '商品信息', align: 'center', templet: '#goods-desc', width: 300},
+                {title: '总价', field: 'item_price', align: 'center', width: 100},
+                {
+                    title: '订单状态', field: 'status', align: 'center', width: 100, templet: function (d) {
+                        return orderStatus[Number(d.status)]
+                    }
+                },
+                {title: '发货地址', field: 'address_detail', align: 'center', templet: '#address-info'},
+                {title: '备注', field: 'remark', align: 'center', width: 80},
+                {title: '操作', toolbar: '#operate-bar', align: 'center'}
+            ]
+        ]
+
+        table.render({
+            elem: '#order-table',
+            url: '/admin/order/list',
+            method: 'post',
+            contentType: 'application/json',
+            request: {
+                pageName: 'page_number', // 页码的参数名称，默认：page
+                limitName: 'page_size' // 每页数据条数的参数名，默认：limit
+            },
+            page: true,
+            limit: 10,
+            cols: cols,
+            skin: 'line',
+            toolbar: '#order-toolbar',
+            defaultToolbar: [{
+                title: '刷新',
+                layEvent: 'refresh',
+                icon: 'layui-icon-refresh',
+            }],
+            parseData: function (res) {
+                return {
+                    "code": res.errorCode,
+                    "msg": res.errorMsg,
+                    "count": res.data.total_count,
+                    "data": res.data.items
+                };
+            }
+        });
+
+        table.on('tool(order-table)', function (obj) {
+            if (obj.event === 'deliver') {
+                window.deliver(obj);
+            } else if (obj.event === 'backToPay') {
+                window.backToPay(obj);
+            }
+        });
+
+        table.on('toolbar(order-table)', function (obj) {
+            if (obj.event === 'add') {
+                window.add();
+            } else if (obj.event === 'refresh') {
+                window.refresh();
+            } else if (obj.event === 'batchRemove') {
+                window.batchRemove(obj);
+            }
+        });
+
+        form.on('submit(role-query)', function (data) {
+            table.reload('order-table', {where: data.field})
+            return false;
+        });
+
+        window.backToPay = function (obj) {
+            layer.confirm('确定改为未支付', {icon: 3, title: '提示'}, function (index) {
+                layer.close(index);
+                $.ajax({
+                    type: 'post',
+                    url: '/admin/order/operate',
+                    data: JSON.stringify({
+                        operate: 0,
+                        id: obj.data.id
+                    }),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (result) {
+                        if (result.errorCode === '0') {
+                            layui.table.reload("order-table");
+                            layui.layer.msg("操作成功", {icon: 1, time: 1000});
+                        } else {
+                            layui.layer.msg(result.msg, {icon: 2, time: 1000});
+                        }
+                    },
+                    dataType: 'json'
+                })
+            });
+        }
+
+        window.deliver = function (obj) {
+            layer.confirm('确定发货', {icon: 3, title: '提示'}, function (index) {
+                layer.close(index);
+                $.ajax({
+                    type: 'post',
+                    url: '/admin/order/operate',
+                    data: JSON.stringify({
+                        operate: 2,
+                        id: obj.data.id
+                    }),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function (result) {
+                        if (result.errorCode === '0') {
+                            layui.table.reload("order-table");
+                            layui.layer.msg("操作成功", {icon: 1, time: 1000});
+                        } else {
+                            layui.layer.msg(result.msg, {icon: 2, time: 1000});
+                        }
+                    },
+                    dataType: 'json'
+                })
+            });
+        }
+
+        window.refresh = function () {
+            table.reload('order-table');
+        }
+    })
+</script>
+</body>
+</html>

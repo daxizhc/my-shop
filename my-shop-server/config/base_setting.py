@@ -1,0 +1,13 @@
+DEBUG = True
+SQLALCHEMY_ECHO = True
+SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@127.0.0.1/my_shop'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+SQLALCHEMY_ENCODING = "utf-8"
+
+INDEX_PAGE_SIZE = 6
+
+APP_ID = '微信小程序appid'
+APP_SECRET = '微信小程序secret'
+
+# 生成用户token的随机字符串
+CIPHER_SECRET = 'fFdmps4bC3urbZ18'

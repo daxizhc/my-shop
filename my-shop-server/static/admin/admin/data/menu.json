@@ -1,0 +1,31 @@
+[
+  {
+    "id": "20",
+    "title": "商品管理",
+    "icon": "layui-icon layui-icon-template-1",
+    "type": 0,
+    "children": [
+      {
+        "id": "21",
+        "title": "类目列表",
+        "icon": "layui-icon layui-icon-console",
+        "type": 1,
+        "href": "goods/category.html"
+      },
+      {
+        "id": "22",
+        "title": "商品列表",
+        "icon": "layui-icon layui-icon-console",
+        "type": 1,
+        "href": "view/goods/goods_list.html"
+      }
+    ]
+  },
+  {
+    "id": "30",
+    "title": "订单管理",
+    "icon": "layui-icon layui-icon-template-1",
+    "type": 1,
+    "href": "view/order/order_list.html"
+  }
+]

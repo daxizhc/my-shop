@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新增类目</title>
+    <link rel="stylesheet" href="/admin/component/pear/css/pear.css"/>
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="mainBox">
+        <div class="main-container">
+            <input type="hidden" name="id" value="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">类目名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="category_name" lay-verify="title" autocomplete="off"
+                           placeholder="请输入类目名称"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权重</label>
+                <div class="layui-input-block">
+                    <input type="text" name="weight" lay-verify="title" autocomplete="off" placeholder="请输入权重"
+                           class="layui-input">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom">
+        <div class="button-container">
+            <button type="submit" class="pear-btn pear-btn-primary pear-btn-sm" lay-submit=""
+                    lay-filter="user-save">
+                <i class="layui-icon layui-icon-ok"></i>
+                提交
+            </button>
+            <button type="reset" class="pear-btn pear-btn-sm">
+                <i class="layui-icon layui-icon-refresh"></i>
+                重置
+            </button>
+        </div>
+    </div>
+</form>
+<script src="/admin/component/layui/layui.js"></script>
+<script src="/admin/component/pear/pear.js"></script>
+<script>
+
+    function getUrlParam(name) {
+        let query = window.location.search.substring(1);
+        let vars = query.split("&");
+        for (let i = 0; i < vars.length; i++) {
+            let pair = vars[i].split("=");
+            if (pair[0] === name) {
+                return pair[1];
+            }
+        }
+        return false;
+    }
+
+    let $ = layui.jquery;
+    let category_id = getUrlParam('id');
+    let name = getUrlParam('name');
+    let weight = getUrlParam('weight');
+    if (category_id) {
+        $("input[name='id']").val(category_id);
+        $("input[name='category_name']").val(decodeURIComponent(name));
+        $("input[name='weight']").val(weight);
+    }
+
+    layui.use(['form', 'jquery'], function () {
+        let form = layui.form;
+
+        form.on('submit(user-save)', function (data) {
+            //关闭当前页
+            $.ajax({
+                url: '/admin/category/save_or_update',
+                data: JSON.stringify(data.field),
+                dataType: 'json',
+                contentType: 'application/json',
+                type: 'post',
+                success: function (result) {
+                    if (result.errorCode === '0') {
+                        parent.layui.table.reload("role-table");
+                        if (category_id) {
+                            parent.layui.layer.msg("修改类目成功", {icon: 1, time: 1000});
+                        } else {
+                            parent.layui.layer.msg("新增类目成功", {icon: 1, time: 1000});
+                        }
+                        parent.layer.close(parent.layer.getFrameIndex(window.name))
+                    } else {
+                        parent.layer.msg("操作失败", {icon: 2});
+                    }
+                }
+            })
+
+            return false;
+        });
+    })
+</script>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="/admin/component/pear/css/pear.css"/>
+</head>
+<body>
+<div class="layui-card" style="margin-top: 10px;">
+    <div class="layui-card-header " id="card-header"></div>
+    <div class="layui-card-body layui-row layui-col-space10" style="display: flex;justify-content: center">
+
+        <form class="layui-form" action="" onsubmit="return false" style="width: 60%">
+            <input type="hidden" name="id" value="">
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品类目</label>
+                <div class="layui-col-md6">
+                    <select id="category-selector" lay-verify="">
+                        <option value="">请选择商品类目</option>
+                    </select>
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品名称</label>
+                <div class="layui-input-block">
+                    <input type="text" name="item_name" required lay-verify="required" placeholder="请输入商品名称"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品图片</label>
+                <div class="layui-input-block" id="input_image">
+                    <img src="" id="goods_image" width="230px" height="230px" alt=""
+                         style="display: none;margin-right: 50px">
+                    <button type="button" class="pear-btn pear-btn-primary" id="upload_image">
+                        上传图片
+                    </button>
+                </div>
+
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品描述</label>
+                <div class="layui-input-block">
+                    <input type="text" name="item_desc" required lay-verify="required" placeholder="请输入商品描述"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">商品价格</label>
+                <div class="layui-input-block">
+                    <input type="text" name="item_price" required lay-verify="required|number"
+                           placeholder="请输入商品价格"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: flex;justify-content: center">
+                <button class="pear-btn pear-btn-primary" lay-submit lay-filter="goods-save">立即提交</button>
+                <button type="reset" class="pear-btn pear-btn-danger" style="margin-left: 50px">重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/admin/component/layui/layui.js"></script>
+<script src="/admin/component/pear/pear.js"></script>
+<script src="/js/utils/url_util.js"></script>
+
+<script>
+    let $ = layui.jquery;
+    let form = layui.form;
+
+    let goods_id = getUrlParam('id');
+    let category_id = null;
+    if (goods_id) {
+        $('#card-header').text('编辑商品');
+        $.post('/admin/goods/' + goods_id, function (res) {
+            if (res.errorCode === '0') {
+                let goods = res.data;
+                $('input[name="id"]').val(goods.id);
+                $('#category-selector').val(goods.category_id);
+                $('input[name="item_name"]').val(goods.item_name);
+                $('input[name="item_desc"]').val(goods.item_desc);
+                $('input[name="item_price"]').val(goods.item_price);
+                $('#goods_image').attr('src', goods.main_image);
+                $("#goods_image").css('display', 'inline-block');
+                category_id = goods.category_id;
+            } else {
+                layer.msg(res.msg, {icon: 2});
+            }
+        }, 'json');
+    } else {
+        $('#card-header').text('添加商品');
+    }
+
+    // 获取类目列表
+    $.get('/admin/category/list', function (res) {
+        for (let i = 0; i < res.data.length; i++) {
+            let option = "<option value='" + res.data[i].id + "'>" + res.data[i].name + "</option>";
+            if (category_id === res.data[i].id) {
+                option = "<option value='" + res.data[i].id + "' selected='selected'>" + res.data[i].name + "</option>";
+            }
+            $("#category-selector").append(option)
+        }
+        form.render('select');
+
+    }, 'json');
+
+    layui.use(['form', 'element', 'code', 'select', 'upload'], function () {
+        layui.code();
+        //图片上传
+        let upload = layui.upload;
+        upload.render({
+            elem: '#upload_image' //绑定元素
+            , url: '/admin/oss/upload_image' //上传接口
+            , done: function (res) {
+                $('#goods_image').attr('src', res.data);
+                $("#goods_image").css('display', 'inline-block');
+                //上传完毕回调
+            }
+            , error: function () {
+                //请求异常回调
+            }
+        });
+
+        //商品保存
+        form.on('submit(goods-save)', function (data) {
+            let params = data.field;
+            params.main_image = $('#goods_image').attr('src');
+            params.category_id = $('#category-selector').val();
+            $.post('/admin/goods/save_or_update', params, function (res) {
+                if (res.errorCode === '0') {
+                    layer.msg('保存成功', {icon: 1});
+                    setTimeout(function () {
+                        parent.layui.admin.refresh(22);
+                        parent.layui.admin.closeCurrentTab();
+                    }, 1000);
+                } else {
+                    layer.msg(res.msg, {icon: 2});
+                }
+            }, 'json');
+        });
+    });
+
+
+</script>
+
+</body>
+</html>
